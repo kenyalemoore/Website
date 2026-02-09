@@ -31,6 +31,7 @@
           overflow: hidden;
           perspective: 1000px;
           position: relative;
+          cursor: default;
         }
 
         /* Night sky background */
@@ -69,7 +70,7 @@
             gap: 30px;
         }
 
-        /* Kirby characters */
+        /* Kirby characters - UPDATED for draggable */
         .kirby {
             width: 80px;
             height: 80px;
@@ -80,13 +81,23 @@
             animation: float 3s ease-in-out infinite;
             animation-delay: var(--delay);
             pointer-events: auto;
-            cursor: pointer;
-            transition: transform 0.3s;
+            cursor: grab;
+            transition: transform 0.3s, box-shadow 0.3s;
             z-index: 60;
+            touch-action: none;
+            user-select: none;
         }
 
-        .kirby:hover {
-            transform: scale(1.2);
+        .kirby.dragging {
+            animation-play-state: paused;
+            cursor: grabbing;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            transform: scale(1.05);
+        }
+
+        .kirby:hover:not(.dragging) {
+            transform: scale(1.15);
         }
 
         .kirby:nth-child(2) {
@@ -156,6 +167,174 @@
             25% { transform: translateY(-15px) rotate(5deg); }
             50% { transform: translateY(-20px) rotate(0deg); }
             75% { transform: translateY(-10px) rotate(-5deg); }
+        }
+
+        /* NEW: Kirby Color Palette */
+        .kirby-color-palette {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 200;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid #ff66b2;
+            box-shadow: 0 0 20px rgba(255, 102, 178, 0.4);
+            backdrop-filter: blur(10px);
+            display: none;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 200px;
+        }
+
+        .kirby-color-palette.active {
+            display: grid;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .kirby-color-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .kirby-color-btn:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        .kirby-color-btn.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px white;
+            border-width: 3px;
+        }
+
+        /* UPDATED: Kirby Controls - Now Collapsible */
+        .kirby-controls-toggle {
+            position: fixed;
+            bottom: -40px;
+            right: 200px;
+            z-index: 100;
+            background: #3399ff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px 20px 0 0;
+            cursor: pointer;
+            font-weight: bold;
+            width: 180px;
+            text-align: center;
+            box-shadow: 0 -4px 15px rgba(51, 153, 255, 0.5);
+            transition: all 0.3s;
+        }
+
+        .kirby-controls-toggle:hover {
+            background: #66b2ff;
+            transform: translateY(-5px);
+        }
+
+        .kirby-controls {
+            position: fixed;
+            bottom: 0;
+            right: 200px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 20px 15px 15px 15px;
+            border-radius: 15px 15px 0 0;
+            color: white;
+            font-family: Arial, sans-serif;
+            width: 180px;
+            backdrop-filter: blur(10px);
+            border: 2px solid #3399ff;
+            box-shadow: 0 0 20px rgba(51, 153, 255, 0.4);
+            transition: transform 0.5s ease-in-out;
+            transform: translateY(0);
+        }
+
+        .kirby-controls.collapsed {
+            transform: translateY(400px);
+        }
+
+        .kirby-controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .kirby-controls h4 {
+            color: #3399ff;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(51, 153, 255, 0.5);
+        }
+
+        .close-kirby-controls {
+            background: #ff6666;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close-kirby-controls:hover {
+            background: #ff3333;
+            transform: scale(1.1);
+        }
+
+        .kirby-control-btn {
+            display: block;
+            width: 100%;
+            margin: 8px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid #3399ff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .kirby-control-btn:hover {
+            background: rgba(51, 153, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* NEW: Selected Kirby Indicator */
+        .selected-kirby-indicator {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100%;
+            border: 3px dashed #ff66b2;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 70;
+            animation: pulseBorder 1.5s infinite;
+            display: none;
+        }
+
+        @keyframes pulseBorder {
+            0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
         }
 
         /* Falling hearts */
@@ -1844,6 +2023,36 @@
         <button class="random-color-btn" id="resetColors" style="margin-top: 8px; background: linear-gradient(45deg, #666, #999);">↩️ Reset Colors</button>
     </div>
 
+    <!-- UPDATED: Kirby Controls Toggle Button -->
+    <button class="kirby-controls-toggle" id="kirbyControlsToggle">🕹️ Show Kirby Controls</button>
+
+    <!-- UPDATED: Kirby Controls - Now Collapsible -->
+    <div class="kirby-controls collapsed" id="kirbyControls">
+        <div class="kirby-controls-header">
+            <h4>🕹️ Kirby Controls</h4>
+            <button class="close-kirby-controls" id="closeKirbyControls">×</button>
+        </div>
+        <button class="kirby-control-btn" id="changeKirbyColor">🎨 Change Kirby Color</button>
+        <button class="kirby-control-btn" id="randomKirbyColor">🎲 Random Kirby Colors</button>
+        <button class="kirby-control-btn" id="resetKirbyColors">↩️ Reset Kirby Colors</button>
+    </div>
+
+    <!-- NEW: Kirby Color Palette -->
+    <div class="kirby-color-palette" id="kirbyColorPalette">
+        <div class="kirby-color-btn" style="background: radial-gradient(circle at 30% 30%, #ffb6d9, #ff66b2);" data-color="pink"></div>
+        <div class="kirby-color-btn" style="background: radial-gradient(circle at 30% 30%, #99ccff, #3399ff);" data-color="blue"></div>
+        <div class="kirby-color-btn" style="background: radial-gradient(circle at 30% 30%, #99ff99, #33cc33);" data-color="green"></div>
+        <div class="kirby-color-btn" style="background: radial-gradient(circle at 30% 30%, #ffff99, #ffcc00);" data-color="yellow"></div>
+        <div class="kirby-color-btn" style="background: radial-gradient(circle at 30% 30%, #cc99ff, #9966ff);" data-color="purple"></div>
+        <div class="kirby-color-btn" style="background: radial-gradient(circle at 30% 30%, #ffcc99, #ff9966);" data-color="orange"></div>
+        <div class="kirby-color-btn" style="background: radial-gradient(circle at 30% 30%, #ff9999, #ff3333);" data-color="red"></div>
+        <div class="kirby-color-btn" style="background: radial-gradient(circle at 30% 30%, #ffffff, #cccccc);" data-color="white"></div>
+        <div class="kirby-color-btn" style="background: radial-gradient(circle at 30% 30%, #cccccc, #666666);" data-color="gray"></div>
+        <div class="kirby-color-btn" style="background: radial-gradient(circle at 30% 30%, #000000, #333333);" data-color="black"></div>
+        <div class="kirby-color-btn" style="background: radial-gradient(circle at 30% 30%, #ff99cc, #ff66b2);" data-color="hotpink"></div>
+        <div class="kirby-color-btn" style="background: radial-gradient(circle at 30% 30%, #99ffff, #33cccc);" data-color="teal"></div>
+    </div>
+
     <!-- Instructions - Now Collapsible with Close Button -->
     <button class="instructions-toggle" id="instructionsToggle">🌸 Show Magical Garden Info</button>
     <div class="instructions collapsed" id="instructionsContainer">
@@ -1866,6 +2075,9 @@
             <li>🌑 Try black & red flower colors!</li>
             <li>📱 All controls are collapsible</li>
             <li>✨ Enjoy the magical animations!</li>
+            <li><strong>✨ NEW: Drag Kirbies with mouse!</strong></li>
+            <li><strong>✨ NEW: Change Kirby colors individually!</strong></li>
+            <li><strong>✨ NEW: Right-click Kirby for color palette!</strong></li>
         </ul>
     </div>
 
@@ -2059,6 +2271,9 @@
     <div id="hearts-container"></div>
 
     <script>
+        // NEW: Kirby color functionality variables
+        let currentlyEditingKirby = null;
+
         // Initialize the scene
         onload = () => {
             const c = setTimeout(() => {
@@ -2100,6 +2315,20 @@
                     document.getElementById('instructionsToggle').textContent = '🌸 Show Magical Garden Info';
                 });
                 
+                // UPDATED: Set up Kirby controls toggle
+                document.getElementById('kirbyControlsToggle').addEventListener('click', function() {
+                    const container = document.getElementById('kirbyControls');
+                    container.classList.remove('collapsed');
+                    this.textContent = '🕹️ Hide Kirby Controls';
+                });
+                
+                // UPDATED: Set up close Kirby controls button
+                document.getElementById('closeKirbyControls').addEventListener('click', function() {
+                    const container = document.getElementById('kirbyControls');
+                    container.classList.add('collapsed');
+                    document.getElementById('kirbyControlsToggle').textContent = '🕹️ Show Kirby Controls';
+                });
+                
                 // Create initial falling hearts
                 createHearts(25);
                 
@@ -2116,8 +2345,378 @@
                 
                 // Add flower color controls (now includes black and red)
                 setupFlowerColorControls();
+                
+                // NEW: Set up Kirby dragging functionality
+                setupKirbyDragging();
+                
+                // NEW: Set up Kirby color controls
+                setupKirbyColorControls();
+                
             }, 1000);
         };
+
+        // NEW: Kirby dragging variables
+        let isDragging = false;
+        let selectedKirby = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        // NEW: Set up Kirby dragging functionality
+        function setupKirbyDragging() {
+            const kirbyContainer = document.getElementById('kirbyContainer');
+            
+            // Mouse down event for starting drag
+            document.addEventListener('mousedown', startDrag);
+            
+            // Mouse move event for dragging
+            document.addEventListener('mousemove', dragKirby);
+            
+            // Mouse up event for ending drag
+            document.addEventListener('mouseup', endDrag);
+            
+            // Touch events for mobile
+            document.addEventListener('touchstart', startDragTouch);
+            document.addEventListener('touchmove', dragKirbyTouch);
+            document.addEventListener('touchend', endDrag);
+            
+            function startDrag(e) {
+                // Only start drag if clicking on a Kirby
+                if (e.target.classList.contains('kirby') || e.target.classList.contains('kirby-feet')) {
+                    e.preventDefault();
+                    isDragging = true;
+                    selectedKirby = e.target.classList.contains('kirby-feet') ? e.target.parentElement : e.target;
+                    
+                    // Calculate offset between mouse and Kirby position
+                    const rect = selectedKirby.getBoundingClientRect();
+                    dragOffsetX = e.clientX - rect.left;
+                    dragOffsetY = e.clientY - rect.top;
+                    
+                    // Add dragging class
+                    selectedKirby.classList.add('dragging');
+                    
+                    // Prevent default behavior
+                    return false;
+                }
+            }
+            
+            function startDragTouch(e) {
+                if (e.touches.length === 1) {
+                    const touch = e.touches[0];
+                    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                    
+                    if (element && (element.classList.contains('kirby') || element.classList.contains('kirby-feet'))) {
+                        e.preventDefault();
+                        isDragging = true;
+                        selectedKirby = element.classList.contains('kirby-feet') ? element.parentElement : element;
+                        
+                        const rect = selectedKirby.getBoundingClientRect();
+                        dragOffsetX = touch.clientX - rect.left;
+                        dragOffsetY = touch.clientY - rect.top;
+                        
+                        selectedKirby.classList.add('dragging');
+                    }
+                }
+            }
+            
+            function dragKirby(e) {
+                if (!isDragging || !selectedKirby) return;
+                
+                e.preventDefault();
+                
+                // Calculate new position
+                const x = e.clientX - dragOffsetX;
+                const y = e.clientY - dragOffsetY;
+                
+                // Convert to percentage relative to container
+                const containerRect = kirbyContainer.getBoundingClientRect();
+                const percentX = ((x - containerRect.left) / containerRect.width) * 100;
+                const percentY = ((y - containerRect.top) / containerRect.height) * 100;
+                
+                // Keep Kirby within bounds (0-100%)
+                const boundedX = Math.max(0, Math.min(100, percentX));
+                const boundedY = Math.max(0, Math.min(100, percentY));
+                
+                // Update Kirby position
+                selectedKirby.style.left = `${boundedX}%`;
+                selectedKirby.style.top = `${boundedY}%`;
+            }
+            
+            function dragKirbyTouch(e) {
+                if (!isDragging || !selectedKirby || e.touches.length !== 1) return;
+                
+                e.preventDefault();
+                const touch = e.touches[0];
+                
+                const x = touch.clientX - dragOffsetX;
+                const y = touch.clientY - dragOffsetY;
+                
+                const containerRect = kirbyContainer.getBoundingClientRect();
+                const percentX = ((x - containerRect.left) / containerRect.width) * 100;
+                const percentY = ((y - containerRect.top) / containerRect.height) * 100;
+                
+                const boundedX = Math.max(0, Math.min(100, percentX));
+                const boundedY = Math.max(0, Math.min(100, percentY));
+                
+                selectedKirby.style.left = `${boundedX}%`;
+                selectedKirby.style.top = `${boundedY}%`;
+            }
+            
+            function endDrag() {
+                if (isDragging && selectedKirby) {
+                    selectedKirby.classList.remove('dragging');
+                    
+                    // Resume animation after a short delay
+                    setTimeout(() => {
+                        if (selectedKirby) {
+                            selectedKirby.style.animationPlayState = 'running';
+                        }
+                    }, 100);
+                }
+                
+                isDragging = false;
+                selectedKirby = null;
+            }
+            
+            // Prevent context menu on Kirbies (for right-click color change)
+            kirbyContainer.addEventListener('contextmenu', function(e) {
+                if (e.target.classList.contains('kirby') || e.target.classList.contains('kirby-feet')) {
+                    e.preventDefault();
+                    
+                    const kirby = e.target.classList.contains('kirby-feet') ? e.target.parentElement : e.target;
+                    showKirbyColorPalette(kirby);
+                    return false;
+                }
+            });
+        }
+
+        // NEW: Set up Kirby color controls
+        function setupKirbyColorControls() {
+            const colorPalette = document.getElementById('kirbyColorPalette');
+            
+            // Close color palette when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!colorPalette.contains(e.target) && !e.target.classList.contains('kirby-color-btn') && 
+                    !e.target.classList.contains('kirby') && !e.target.classList.contains('kirby-feet')) {
+                    colorPalette.classList.remove('active');
+                    currentlyEditingKirby = null;
+                    
+                    // Remove selection indicator
+                    document.querySelectorAll('.selected-kirby-indicator').forEach(indicator => {
+                        indicator.remove();
+                    });
+                }
+            });
+            
+            // Change Kirby color button
+            document.getElementById('changeKirbyColor').addEventListener('click', function() {
+                const kirbys = document.querySelectorAll('.kirby');
+                if (kirbys.length > 0) {
+                    // Select a random Kirby
+                    const randomKirby = kirbys[Math.floor(Math.random() * kirbys.length)];
+                    showKirbyColorPalette(randomKirby);
+                }
+            });
+            
+            // Random Kirby colors button
+            document.getElementById('randomKirbyColor').addEventListener('click', function() {
+                const kirbys = document.querySelectorAll('.kirby');
+                kirbys.forEach(kirby => {
+                    changeKirbyColor(kirby, getRandomColor());
+                });
+            });
+            
+            // Reset Kirby colors button
+            document.getElementById('resetKirbyColors').addEventListener('click', function() {
+                const kirbys = document.querySelectorAll('.kirby');
+                const defaultColors = [
+                    {main: '#ff66b2', feet: '#ff66b2'},
+                    {main: '#3399ff', feet: '#3399ff'},
+                    {main: '#33cc33', feet: '#33cc33'},
+                    {main: '#ffcc00', feet: '#ffcc00'}
+                ];
+                
+                kirbys.forEach((kirby, index) => {
+                    const colorIndex = index % 4;
+                    const color = defaultColors[colorIndex];
+                    kirby.style.background = `radial-gradient(circle at 30% 30%, ${lightenColor(color.main)}, ${color.main})`;
+                    
+                    const feet = kirby.querySelector('.kirby-feet');
+                    if (feet) {
+                        feet.style.background = color.feet;
+                        feet.style.boxShadow = `25px 0 ${color.feet}`;
+                    }
+                });
+            });
+            
+            // Color button clicks
+            document.querySelectorAll('.kirby-color-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (currentlyEditingKirby) {
+                        const color = this.getAttribute('data-color');
+                        changeKirbyColor(currentlyEditingKirby, color);
+                        colorPalette.classList.remove('active');
+                        
+                        // Remove selection indicator
+                        const indicator = currentlyEditingKirby.querySelector('.selected-kirby-indicator');
+                        if (indicator) {
+                            indicator.remove();
+                        }
+                        
+                        currentlyEditingKirby = null;
+                    }
+                });
+            });
+        }
+
+        // NEW: Show color palette for a specific Kirby
+        function showKirbyColorPalette(kirby) {
+            const colorPalette = document.getElementById('kirbyColorPalette');
+            currentlyEditingKirby = kirby;
+            
+            // Position palette near the Kirby
+            const rect = kirby.getBoundingClientRect();
+            const paletteWidth = 200;
+            const paletteHeight = 200;
+            
+            // Calculate position to keep palette on screen
+            let leftPos = rect.right + 10;
+            let topPos = rect.top;
+            
+            // Adjust if palette would go off screen
+            if (leftPos + paletteWidth > window.innerWidth) {
+                leftPos = rect.left - paletteWidth - 10;
+            }
+            if (topPos + paletteHeight > window.innerHeight) {
+                topPos = window.innerHeight - paletteHeight - 10;
+            }
+            
+            colorPalette.style.left = `${leftPos}px`;
+            colorPalette.style.top = `${topPos}px`;
+            colorPalette.style.bottom = 'auto';
+            colorPalette.style.right = 'auto';
+            
+            colorPalette.classList.add('active');
+            
+            // Add selection indicator to Kirby
+            addKirbySelectionIndicator(kirby);
+        }
+
+        // NEW: Add visual indicator to selected Kirby
+        function addKirbySelectionIndicator(kirby) {
+            // Remove any existing indicator
+            const existingIndicator = kirby.querySelector('.selected-kirby-indicator');
+            if (existingIndicator) {
+                existingIndicator.remove();
+            }
+            
+            // Create new indicator
+            const indicator = document.createElement('div');
+            indicator.className = 'selected-kirby-indicator';
+            indicator.style.display = 'block';
+            kirby.appendChild(indicator);
+        }
+
+        // NEW: Change Kirby color
+        function changeKirbyColor(kirby, colorName) {
+            const colorMap = {
+                pink: {main: '#ff66b2', light: '#ffb6d9', feet: '#ff66b2'},
+                blue: {main: '#3399ff', light: '#99ccff', feet: '#3399ff'},
+                green: {main: '#33cc33', light: '#99ff99', feet: '#33cc33'},
+                yellow: {main: '#ffcc00', light: '#ffff99', feet: '#ffcc00'},
+                purple: {main: '#9966ff', light: '#cc99ff', feet: '#9966ff'},
+                orange: {main: '#ff9966', light: '#ffcc99', feet: '#ff9966'},
+                red: {main: '#ff3333', light: '#ff9999', feet: '#ff3333'},
+                white: {main: '#ffffff', light: '#ffffff', feet: '#cccccc'},
+                gray: {main: '#666666', light: '#cccccc', feet: '#666666'},
+                black: {main: '#000000', light: '#333333', feet: '#000000'},
+                hotpink: {main: '#ff66b2', light: '#ff99cc', feet: '#ff66b2'},
+                teal: {main: '#33cccc', light: '#99ffff', feet: '#33cccc'}
+            };
+            
+            const color = colorMap[colorName] || colorMap.pink;
+            
+            // Update Kirby main color
+            kirby.style.background = `radial-gradient(circle at 30% 30%, ${color.light}, ${color.main})`;
+            
+            // Update Kirby feet color
+            const feet = kirby.querySelector('.kirby-feet');
+            if (feet) {
+                feet.style.background = color.feet;
+                feet.style.boxShadow = `25px 0 ${color.feet}`;
+            }
+            
+            // Create a sparkle effect
+            createColorChangeSparkle(kirby, color.main);
+        }
+
+        // NEW: Get random color for Kirby
+        function getRandomColor() {
+            const colors = ['pink', 'blue', 'green', 'yellow', 'purple', 'orange', 'red', 'white', 'gray', 'black', 'hotpink', 'teal'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // NEW: Lighten color for gradient
+        function lightenColor(color) {
+            // Simple color lightening for gradient effect
+            if (color.startsWith('#')) {
+                // Parse hex color
+                const hex = color.substring(1);
+                const num = parseInt(hex, 16);
+                
+                // Lighten by 20%
+                const r = Math.min(255, ((num >> 16) & 0xFF) * 1.2);
+                const g = Math.min(255, ((num >> 8) & 0xFF) * 1.2);
+                const b = Math.min(255, (num & 0xFF) * 1.2);
+                
+                return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+            }
+            return color;
+        }
+
+        // NEW: Create sparkle effect when changing Kirby color
+        function createColorChangeSparkle(kirby, color) {
+            const sparkleCount = 8;
+            const rect = kirby.getBoundingClientRect();
+            
+            for (let i = 0; i < sparkleCount; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.style.position = 'absolute';
+                sparkle.style.width = '10px';
+                sparkle.style.height = '10px';
+                sparkle.style.background = color;
+                sparkle.style.borderRadius = '50%';
+                sparkle.style.filter = 'blur(2px)';
+                sparkle.style.zIndex = '200';
+                
+                // Position around Kirby
+                const angle = (i / sparkleCount) * Math.PI * 2;
+                const distance = 50;
+                const x = rect.left + rect.width/2 + Math.cos(angle) * distance;
+                const y = rect.top + rect.height/2 + Math.sin(angle) * distance;
+                
+                sparkle.style.left = `${x}px`;
+                sparkle.style.top = `${y}px`;
+                
+                document.body.appendChild(sparkle);
+                
+                // Animate sparkle
+                sparkle.animate([
+                    { transform: 'scale(0)', opacity: 0 },
+                    { transform: 'scale(1.5)', opacity: 1 },
+                    { transform: 'scale(0)', opacity: 0 }
+                ], {
+                    duration: 500,
+                    easing: 'ease-out'
+                });
+                
+                // Remove sparkle after animation
+                setTimeout(() => {
+                    if (sparkle.parentNode) {
+                        sparkle.remove();
+                    }
+                }, 500);
+            }
+        }
 
         // Create falling hearts
         function createHearts(count = 10) {
@@ -2190,6 +2789,7 @@
             
             // Add click event for heart burst
             kirby.addEventListener('click', function(e) {
+                if (isDragging) return; // Don't trigger heart burst while dragging
                 e.stopPropagation();
                 
                 // Scale animation
@@ -2200,6 +2800,13 @@
                 
                 // Create a burst of hearts
                 createHeartBurst(this);
+            });
+            
+            // Add right-click event for color change
+            kirby.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                showKirbyColorPalette(this);
+                return false;
             });
             
             kirbyContainer.appendChild(kirby);
@@ -2645,9 +3252,20 @@
             // Reset flower colors
             document.getElementById('resetColors').click();
             
+            // Reset Kirby colors
+            document.getElementById('resetKirbyColors').click();
+            
             // Close instructions if open
             document.getElementById('instructionsContainer').classList.add('collapsed');
             document.getElementById('instructionsToggle').textContent = '🌸 Show Magical Garden Info';
+            
+            // Close Kirby controls if open
+            document.getElementById('kirbyControls').classList.add('collapsed');
+            document.getElementById('kirbyControlsToggle').textContent = '🕹️ Show Kirby Controls';
+            
+            // Close Kirby color palette if open
+            document.getElementById('kirbyColorPalette').classList.remove('active');
+            currentlyEditingKirby = null;
         }
 
         // Set up control buttons
