@@ -2075,9 +2075,9 @@
             <li>🌑 Try black & red flower colors!</li>
             <li>📱 All controls are collapsible</li>
             <li>✨ Enjoy the magical animations!</li>
-            <li><strong>✨ NEW: Drag Kirbies with mouse!</strong></li>
-            <li><strong>✨ NEW: Change Kirby colors individually!</strong></li>
-            <li><strong>✨ NEW: Right-click Kirby for color palette!</strong></li>
+            <li><strong>✨ Drag Kirbies with mouse!</strong></li>
+            <li><strong>✨ Change Kirby colors individually!</strong></li>
+            <li><strong>✨ Right-click Kirby for color palette!</strong></li>
         </ul>
     </div>
 
@@ -3076,16 +3076,16 @@
         // Crossword puzzle
         function initializeCrossword() {
             const crosswordGrid = document.getElementById('crosswordGrid');
-            // 8x8 grid with your exact layout
+            // 8x8 grid with ROSE starting at column 3, row 0 (the R in HEART)
             const solution = [
-                ['H', 'E', 'A', 'R', 'T', '', '', ''],
-                ['', '', '', '', 'O', '', '', ''],
-                ['', '', '', '', 'S', '', '', ''],
-                ['', '', '', '', 'E', '', '', ''],
-                ['K', 'I', 'R', 'B', 'Y', '', '', ''],
-                ['P', 'U', 'R', 'P', 'L', 'E', '', ''],
-                ['F', 'L', 'O', 'W', 'E', 'R', '', ''],
-                ['P', 'I', 'N', 'K', '', '', '', '']
+                ['H', 'E', 'A', 'R', 'T', '', '', ''],    // Row 0: HEART (1 Across) - R at [0,3]
+                ['', '', '', 'O', '', '', '', ''],        // Row 1: O (2 Down - ROSE) at [1,3]
+                ['', '', '', 'S', '', '', '', ''],        // Row 2: S (2 Down - ROSE) at [2,3]
+                ['', '', '', 'E', '', '', '', ''],        // Row 3: E (2 Down - ROSE) at [3,3]
+                ['K', 'I', 'R', 'B', 'Y', '', '', ''],    // Row 4: KIRBY (3 Across) - starts at [4,0]
+                ['P', 'U', 'R', 'P', 'L', 'E', '', ''],   // Row 5: PURPLE (4 Across) - starts at [5,0]
+                ['F', 'L', 'O', 'W', 'E', 'R', 'S', ''],  // Row 6: FLOWERS (5 Across) - starts at [6,0]
+                ['P', 'I', 'N', 'K', '', '', '', '']      // Row 7: PINK (6 Across) - starts at [7,0]
             ];
 
             const userInput = Array(8).fill().map(() => Array(8).fill(''));
@@ -3135,14 +3135,14 @@
 
         function checkCrosswordSolution() {
             const solution = [
-                ['H', 'E', 'A', 'R', 'T', '', '', ''],
-                ['', '', '', '', 'O', '', '', ''],
-                ['', '', '', '', 'S', '', '', ''],
-                ['', '', '', '', 'E', '', '', ''],
-                ['K', 'I', 'R', 'B', 'Y', '', '', ''],
-                ['P', 'U', 'R', 'P', 'L', 'E', '', ''],
-                ['F', 'L', 'O', 'W', 'E', 'R', '', ''],
-                ['P', 'I', 'N', 'K', '', '', '', '']
+                ['H', 'E', 'A', 'R', 'T', '', '', ''],    // Row 0: HEART (1 Across)
+                ['', '', '', 'O', '', '', '', ''],        // Row 1: O (2 Down - ROSE)
+                ['', '', '', 'S', '', '', '', ''],        // Row 2: S (2 Down - ROSE)
+                ['', '', '', 'E', '', '', '', ''],        // Row 3: E (2 Down - ROSE)
+                ['K', 'I', 'R', 'B', 'Y', '', '', ''],    // Row 4: KIRBY (3 Across)
+                ['P', 'U', 'R', 'P', 'L', 'E', '', ''],   // Row 5: PURPLE (4 Across)
+                ['F', 'L', 'O', 'W', 'E', 'R', 'S', ''],  // Row 6: FLOWERS (5 Across)
+                ['P', 'I', 'N', 'K', '', '', '', '']      // Row 7: PINK (6 Across)
             ];
             
             const crosswordGrid = document.getElementById('crosswordGrid');
@@ -3181,7 +3181,8 @@
                 let colorIndex = 0;
                 
                 const colorCycle = setInterval(() => {
-                    document.querySelector(`.color-btn[data-color="${celebrationColors[colorIndex]}"]`).click();
+                    const colorBtn = document.querySelector(`.color-btn[data-color="${celebrationColors[colorIndex]}"]`);
+                    if (colorBtn) colorBtn.click();
                     colorIndex = (colorIndex + 1) % celebrationColors.length;
                 }, 500);
                 
